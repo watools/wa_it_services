@@ -13,15 +13,15 @@ get '/' do
 end
 
 get '/test' do
-  redirect '/index_test.html'
+  redirect '/index-test.html'
 end
 
 get '/calculate' do
-  params[:iturl]
+  
 
 	agent = Mechanize.new # содержит инфу о куки, сессиях и др.
 	page = agent.get 'https://it.bonasource.com/'# первый раз обращаемся чтобы получить куки
-	page = agent.get 'https://it.bonasource.com/IssueListSimple.asp?projectid=114&sp3=-2&sp20=sp5&sp21=0&username=read_only_user&pass=w1ldb0na$'
+	page = agent.get params[:iturl]
 
 	puts "item " + page.parser.xpath('//table/tr').count.to_s
 
