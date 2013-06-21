@@ -12,6 +12,10 @@ get '/' do
   redirect '/index.html'
 end
 
+get '/test' do
+  redirect '/index_test.html'
+end
+
 get '/calculate' do
   params[:iturl]
 
