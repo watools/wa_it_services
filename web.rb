@@ -5,7 +5,6 @@ require 'openssl'
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 I_KNOW_THAT_OPENSSL_VERIFY_PEER_EQUALS_VERIFY_NONE_IS_WRONG = nil
 
-
 set :public_folder, 'public'
 
 get '/' do
@@ -17,31 +16,51 @@ get '/test' do
 end
 
 get '/calculate' do
-  
-
 	agent = Mechanize.new # содержит инфу о куки, сессиях и др.
 	page = agent.get 'https://it.bonasource.com/'# первый раз обращаемся чтобы получить куки
 	page = agent.get params[:iturl]
 
-	puts "item " + page.parser.xpath('//table/tr').count.to_s
-
 	statuses = {}
-	statuses["To Do"] = 0
-	statuses['To CodeReview'] = 0
-	statuses['Ready to dev'] = 0
-	statuses['Postponed'] = 0
-	statuses['To Estimate'] = 0
-	statuses['To Test'] = 0
-	statuses['To Accept'] = 0
-	statuses['Analysis'] = 0
-	statuses['Design'] = 0
-	statuses['Done'] = 0
-	statuses['To Publish'] = 0
-	statuses['Archived'] = 0
 
 	page.parser.xpath('//table/tr/td[5]').each do |td| 
-		statuses[td.content] = statuses[td.content]+1
+	  statuses[td.content] = 0 if statuses[td.content] == nil
+	  statuses[td.content] = statuses[td.content] + 1
 	end
 	statuses.to_json
+end
 
+get '/extract' do
+  	agent = Mechanize.new # содержит инфу о куки, сессиях и др.
+	page = agent.get 'https://it.bonasource.com/'# первый раз обращаемся чтобы получить куки
+	page = agent.get params[:iturl]
+
+	c_names = params[:columnNames].split(':')
+	column_names = {}
+
+	
+	# get mapping between column name and and its number
+	page.parser.xpath('//table//th').each_with_index do |th, index|
+	  column_names[th.content] = index if c_names.include?(th.content)
+	end
+	puts column_names
+
+        all_issues_fields = []
+	page.parser.xpath('//table//tr').drop(1).each do |tr| 
+	  issue_fields = []
+	 
+          tds = tr.xpath('td')
+          puts tds
+	  column_names.values.each do |column_index|
+	    issue_fields.push tds[column_index].content  
+	  end
+ 	  
+	  all_issues_fields.push issue_fields
+	end
+	
+	result = {}
+	result["columns names"] = c_names
+	result["issues fields values"] = all_issues_fields
+	
+	result
+	
 end
