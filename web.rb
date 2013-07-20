@@ -61,6 +61,6 @@ get '/extract' do
 	result["columns names"] = c_names
 	result["issues fields values"] = all_issues_fields
 	
-	result
+	result.to_json
 	
 end
