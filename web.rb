@@ -35,26 +35,30 @@ get '/extract' do
 	page = agent.get params[:iturl]
 
 	c_names = params[:columnNames].split(':')
+
 	column_names = {}
 
 	
 	# get mapping between column name and and its number
 	page.parser.xpath('//table//th').each_with_index do |th, index|
-	  column_names[th.content] = index if c_names.include?(th.content)
+	column_names[th.content] = index if c_names.include?(th.content)
+
 	end
 	puts column_names
 
-        all_issues_fields = []
+        all_issues_fields = {}
 	page.parser.xpath('//table//tr').drop(1).each do |tr| 
 	  issue_fields = []
 	 
           tds = tr.xpath('td')
-          puts tds
+	  
+          #puts tds
 	  column_names.values.each do |column_index|
 	    issue_fields.push tds[column_index].content  
 	  end
  	  
-	  all_issues_fields.push issue_fields
+	  issue_ID = tds[1].content
+	  all_issues_fields[issue_ID] = issue_fields
 	end
 	
 	result = {}
