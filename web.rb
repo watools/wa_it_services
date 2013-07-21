@@ -57,7 +57,7 @@ get '/extract' do
 	    issue_fields.push tds[column_index].content  
 	  end
  	  
-	  issue_ID = tds[1].content
+	  issue_ID = 'i' + tds[1].content # extra 'i' needed to avoid problem with javascript hash in GAS
 	  all_issues_fields[issue_ID] = issue_fields
 	end
 	
